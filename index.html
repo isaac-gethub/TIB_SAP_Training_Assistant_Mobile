@@ -5,8 +5,18 @@
 <header><div><b>TIB SAP Training Assistant</b><small>Mobile Companion</small></div><button id="install" hidden>Install</button></header>
 <main><section class="setup"><div class="sap"><b>START SAP ON YOUR PC FIRST</b><span>1. Open SAP GUI & log in &nbsp;→&nbsp; 2. Keep SAP open &nbsp;→&nbsp; 3. Use this phone beside your PC</span></div>
 <label>COURSE<select id="course"></select></label><label>MODULE / WEEK<select id="module"></select></label><label>LAB<select id="lab"></select></label></section>
-<section id="card" class="card"><div id="progress"></div><h2 id="labtitle"></h2><div id="objective" class="objective"></div><h3 id="steptitle"></h3><div class="tag">READ</div><p id="action" class="action"></p>
-<div class="buttons"><button id="listen">🔊 LISTEN</button><button id="show">👁 SHOW ME</button></div><div id="audioControls" class="audio-controls" hidden><button id="pause">⏸ PAUSE</button><button id="resume" disabled>▶ RESUME</button><button id="stop">⏹ STOP</button></div>
-<div id="showbox" class="showbox" hidden></div><div class="tag do">DO IN SAP</div><p>Perform the instruction in the SAP session already open on your computer.</p><div class="tag confirm">CONFIRM</div><p id="confirm"></p>
+<section id="prelab" class="card prelab">
+<div id="preprogress"></div><h2 id="prelabtitle"></h2><div id="preobjective" class="objective"></div>
+<div class="prelab-label">BEFORE YOU START SAP</div>
+<h3>🎧 HEAR HOW THIS LAB IS DONE</h3>
+<p class="prelab-explain">Listen to the complete consultant walkthrough before you begin. It explains how this lab was carried out from start to finish so you understand the work before performing it yourself. <b>It is not SAP navigation guidance.</b></p>
+<div id="narrationStatus" class="narration-status"></div>
+<div class="buttons"><button id="walkthrough">▶ PLAY WALKTHROUGH</button><button id="startLab">START LAB →</button></div>
+<div id="audioControls" class="audio-controls" hidden><button id="pause">⏸ PAUSE</button><button id="resume" disabled>▶ RESUME</button><button id="stop">⏹ STOP</button></div>
+</section>
+<section id="card" class="card" hidden><div id="progress"></div><h2 id="labtitle"></h2><div id="objective" class="objective"></div><div class="execution-banner"><b>NOW PERFORM THE LAB YOURSELF IN SAP</b></div><h3 id="steptitle"></h3><div class="tag">READ</div><p id="action" class="action"></p>
+<div class="buttons"><button id="show">👁 SHOW ME — SAP NAVIGATION</button></div>
+<div id="showbox" class="showbox" hidden></div><div class="tag do">DO IN SAP</div><p>Perform the instruction in the SAP session already open on your computer.</p><div id="evidenceBlock" hidden><div class="tag evidence">EVIDENCE / DOCUMENTATION</div><p id="evidenceText"></p></div>
+<div class="tag confirm">CONFIRM</div><p id="confirm"></p>
 <div class="nav"><button id="prev">← Previous</button><button id="next">Confirm & Next →</button></div></section></main>
-<footer>READ → LISTEN → SHOW ME → DO IN SAP → CONFIRM → NEXT</footer><script src="app.js"></script></body></html>
+<footer>HEAR HOW THIS LAB IS DONE → START LAB → READ → SHOW ME → DO IN SAP → CONFIRM → NEXT</footer><script src="app.js"></script></body></html>

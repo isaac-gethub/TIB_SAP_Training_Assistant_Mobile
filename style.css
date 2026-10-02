@@ -3,3 +3,12 @@
 
 
 .ios-install-guide{margin:10px 12px 4px;padding:10px 12px;border-radius:10px;background:#eef5fb;color:#102a43;font-size:14px;line-height:1.35;text-align:center}
+
+.prelab-label,.execution-banner{margin:12px 0 8px;padding:10px;border-radius:8px;background:#fff4cc;font-weight:800;color:#102a43}
+.prelab-explain{line-height:1.5}
+.narration-status{margin:10px 0;color:#52606d;font-size:14px}
+#walkthrough,#startLab{flex:1}
+#startLab{background:#1f6f43;color:white}
+
+.tag.evidence{margin-top:14px;background:#fff0d5;color:#6b3d00;font-weight:800}
+#evidenceBlock{border-left:4px solid #c77700;padding-left:10px}
