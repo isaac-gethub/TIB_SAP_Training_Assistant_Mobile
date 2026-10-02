@@ -1,0 +1,20 @@
+TIB TRAINING ASSISTANT — SUPABASE ENROLLMENT GATE v2.0
+
+Supabase project: TIB-training-lms
+Authentication: Supabase Auth email/password
+Entitlement source: public.enrollments + public.training_assistant_courses
+Trainee entitlement RPC: public.get_my_training_assistant_courses()
+Admin backend: Edge Function training-assistant-admin
+Admin operations: invite_user, list_users, upsert_enrollment, set_enrollment_active, send_password_reset
+Course codes:
+  TIB-SECURITY -> sap_security_specialist
+  TIB-JOB-READINESS -> sap_controls_job_readiness
+  TIB-FULL-SWEEP -> sap_controls_full_sweep
+  TIB-THORNFIELD -> thornfield_full_sweep_unified
+
+Security:
+- No service-role key is included in either trainee application.
+- Trainee applications use only the Supabase publishable key and the authenticated trainee JWT.
+- Training Assistant entitlements are read-only to trainees.
+- The existing self-enrollment policy was narrowed so trainees cannot self-create any of the four TIB Training Assistant course codes.
+- Administrative enrollment changes are restricted to TIB staff and audited.

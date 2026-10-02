@@ -2,7 +2,15 @@
 <div id="iosInstallGuide" class="ios-install-guide" hidden><strong>📲 iPhone/iPad:</strong> Safari → Share → Add to Home Screen.</div>
 
 
-<header><div><b>TIB SAP Training Assistant</b><small>Mobile Companion</small></div><button id="install" hidden>Install</button></header>
+<header><div><b>TIB SAP Training Assistant</b><small>Mobile Companion</small></div><div class="header-actions"><button id="logout" hidden>Logout</button><button id="install" hidden>Install</button></div></header>
+<section id="loginPanel" class="login-panel">
+  <div class="login-card"><h2>Trainee Sign In</h2><p>Sign in with your TIB trainee account. Only actively enrolled courses will load.</p>
+  <label>EMAIL<input id="loginEmail" type="email" autocomplete="username"></label>
+  <label>PASSWORD<input id="loginPassword" type="password" autocomplete="current-password"></label>
+  <div id="loginStatus" class="narration-status"></div>
+  <div class="buttons"><button id="forgotPassword">Forgot Password</button><button id="signIn">SIGN IN →</button></div></div>
+</section>
+<div id="appShell" hidden>
 <main><section class="setup"><div class="sap"><b>START SAP ON YOUR PC FIRST</b><span>1. Open SAP GUI & log in &nbsp;→&nbsp; 2. Keep SAP open &nbsp;→&nbsp; 3. Use this phone beside your PC</span></div>
 <label>COURSE<select id="course"></select></label><label>MODULE / WEEK<select id="module"></select></label><label>LAB<select id="lab"></select></label></section>
 <section id="prelab" class="card prelab">
@@ -19,4 +27,4 @@
 <div id="showbox" class="showbox" hidden></div><div class="tag do">DO IN SAP</div><p>Perform the instruction in the SAP session already open on your computer.</p><div id="evidenceBlock" hidden><div class="tag evidence">EVIDENCE / DOCUMENTATION</div><p id="evidenceText"></p></div>
 <div class="tag confirm">CONFIRM</div><p id="confirm"></p>
 <div class="nav"><button id="prev">← Previous</button><button id="next">Confirm & Next →</button></div></section></main>
-<footer>HEAR HOW THIS LAB IS DONE → START LAB → READ → SHOW ME → DO IN SAP → CONFIRM → NEXT</footer><script src="app.js"></script></body></html>
+<footer>HEAR HOW THIS LAB IS DONE → START LAB → READ → SHOW ME → DO IN SAP → CONFIRM → NEXT</footer></div><script src="app.js"></script></body></html>
