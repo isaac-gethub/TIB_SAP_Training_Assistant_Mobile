@@ -61,21 +61,19 @@ function updateInstallUI(){
   const done = document.getElementById('installedStatus');
   if(!btn || !ios || !done) return;
 
-  btn.hidden = true;
+  btn.hidden = false;
   ios.hidden = true;
   done.hidden = true;
 
   if(isStandaloneMode()){
-    done.hidden = false;
+    btn.textContent='✓ TIB APP INSTALLED';
+    btn.disabled=true;
+    done.hidden=false;
     return;
   }
-  if(isIOSDevice()){
-    ios.hidden = false;
-    return;
-  }
-  if(deferredInstallPrompt){
-    btn.hidden = false;
-  }
+  btn.disabled=false;
+  btn.textContent='📲 INSTALL TIB APP';
+  if(isIOSDevice()) ios.hidden=false;
 }
 
 window.addEventListener('beforeinstallprompt', (event) => {
@@ -93,13 +91,21 @@ window.addEventListener('DOMContentLoaded', () => {
   const btn = document.getElementById('installApp');
   if(btn){
     btn.addEventListener('click', async () => {
-      if(!deferredInstallPrompt) return;
-      deferredInstallPrompt.prompt();
-      try {
-        await deferredInstallPrompt.userChoice;
-      } finally {
-        deferredInstallPrompt = null;
-        updateInstallUI();
+      if(isStandaloneMode()) return;
+      if(isIOSDevice()){
+        alert('To install on iPhone/iPad: open this page in Safari, tap Share, then tap Add to Home Screen.');
+        return;
+      }
+      if(deferredInstallPrompt){
+        deferredInstallPrompt.prompt();
+        try {
+          await deferredInstallPrompt.userChoice;
+        } finally {
+          deferredInstallPrompt = null;
+          updateInstallUI();
+        }
+      } else {
+        alert('To install on Android: open this page in Chrome, tap the three-dot menu (⋮), then choose Install app or Add to Home screen.');
       }
     });
   }

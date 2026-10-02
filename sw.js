@@ -1,4 +1,4 @@
-const C='tib-mobile-v1.0.2';
+const C='tib-mobile-v1.0.3';
 const A=['./','index.html','style.css','app.js','courses.json','manifest.webmanifest'];
 self.addEventListener('install',e=>{self.skipWaiting();e.waitUntil(caches.open(C).then(c=>c.addAll(A)))});
 self.addEventListener('activate',e=>e.waitUntil(Promise.all([caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==C).map(k=>caches.delete(k)))),self.clients.claim()])));
