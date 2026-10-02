@@ -1,5 +1,66 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="style.css"><title>Reset TIB Password</title></head><body><header><div><b>TIB SAP Training Assistant</b><small>Password Reset</small></div></header><section class="login-panel"><div class="login-card"><h2>Create New Password</h2><label>NEW PASSWORD<input id="p1" type="password"></label><label>CONFIRM PASSWORD<input id="p2" type="password"></label><div id="status" class="narration-status"></div><div class="buttons"><button id="save">SAVE NEW PASSWORD</button></div></div></section><script>
-const U='https://blfgwysgekfqhcafofhe.supabase.co',K='sb_publishable_ThLetpd4hj49fjce-kXoFA_v4ghwIqV';
-const q=new URLSearchParams(location.hash.slice(1)); let token=q.get('access_token');
-async function save(){let a=document.getElementById('p1').value,b=document.getElementById('p2').value,s=document.getElementById('status');if(!token){s.textContent='This reset link is invalid or expired.';return}if(a.length<8){s.textContent='Use at least 8 characters.';return}if(a!==b){s.textContent='Passwords do not match.';return}let r=await fetch(U+'/auth/v1/user',{method:'PUT',headers:{apikey:K,Authorization:'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify({password:a})});if(r.ok){s.textContent='Password changed successfully. Return to the TIB Training Assistant and sign in.';token=null}else{let j=await r.json().catch(()=>({}));s.textContent='Reset failed: '+(j.message||j.msg||r.status)}}
-document.getElementById('save').onclick=save;</script></body></html>
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="style.css">
+<title>Reset TIB Password</title>
+<style>
+.reset-wrap{max-width:520px;margin:8vh auto;padding:20px}.reset-card{background:#fff;border:1px solid #dbe2ea;border-radius:14px;padding:24px}.reset-card h2{margin-top:0}.reset-card label{display:block;margin:14px 0;font-weight:700}.reset-card input{width:100%;padding:12px;border:1px solid #b8c2cc;border-radius:8px;margin-top:6px}.reset-card button{width:100%;padding:12px;border:0;border-radius:8px;font-weight:700;background:#111827;color:white}.status{margin:14px 0;padding:10px;border-radius:8px;background:#eef2ff}.error{background:#fee2e2;color:#991b1b}.success{background:#dcfce7;color:#166534}.muted{color:#64748b;font-size:13px}
+</style>
+</head>
+<body>
+<header><div><b>TIB SAP Training Assistant</b><small>Password Reset</small></div></header>
+<div class="reset-wrap">
+  <div class="reset-card">
+    <h2>Create New Password</h2>
+    <p class="muted">Open this page from the password-reset email. Enter and confirm your new password.</p>
+    <div id="status" class="status">Validating your reset link…</div>
+    <div id="form" style="display:none">
+      <label>NEW PASSWORD<input id="p1" type="password" autocomplete="new-password"></label>
+      <label>CONFIRM PASSWORD<input id="p2" type="password" autocomplete="new-password"></label>
+      <button id="save">SAVE NEW PASSWORD</button>
+    </div>
+  </div>
+</div>
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+const U='https://blfgwysgekfqhcafofhe.supabase.co';
+const K='sb_publishable_ThLetpd4hj49fjce-kXoFA_v4ghwIqV';
+const sb=createClient(U,K,{auth:{detectSessionInUrl:true,persistSession:true,autoRefreshToken:true}});
+const status=document.getElementById('status');
+const form=document.getElementById('form');
+function show(text,kind=''){status.textContent=text;status.className='status '+kind;}
+async function ensureRecoverySession(){
+  try{
+    const url=new URL(location.href);
+    const code=url.searchParams.get('code');
+    if(code){
+      const {error}=await sb.auth.exchangeCodeForSession(code);
+      if(error) throw error;
+      history.replaceState({},document.title,location.pathname);
+    }
+    const {data:{session}}=await sb.auth.getSession();
+    if(session){show('Reset link verified. Enter your new password.');form.style.display='block';return;}
+    await new Promise(resolve=>setTimeout(resolve,500));
+    const {data:{session:session2}}=await sb.auth.getSession();
+    if(session2){show('Reset link verified. Enter your new password.');form.style.display='block';return;}
+    show('This password-reset link is invalid, expired, or the redirect URL is not authorized. Request a new password-reset email from the TIB Training Assistant.','error');
+  }catch(e){show('Unable to validate the reset link: '+(e.message||e),'error');}
+}
+async function save(){
+  const a=document.getElementById('p1').value;
+  const b=document.getElementById('p2').value;
+  if(a.length<8){show('Use at least 8 characters.','error');return;}
+  if(a!==b){show('Passwords do not match.','error');return;}
+  const {error}=await sb.auth.updateUser({password:a});
+  if(error){show('Reset failed: '+error.message,'error');return;}
+  show('Password changed successfully. Return to the TIB Training Assistant and sign in with your new password.','success');
+  form.style.display='none';
+  await sb.auth.signOut();
+}
+document.getElementById('save').onclick=save;
+ensureRecoverySession();
+</script>
+</body>
+</html>
