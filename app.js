@@ -44,71 +44,17 @@ function speak(){
 function show(){let l=DATA[ci].modules[mi].labs[li],s=l.steps[si],t=(s.action||'').replace(/\s+(then|→)\s+/gi,' > ');let parts=t.split(/\s*>\s*|;\s*/).filter(Boolean);$('showbox').innerHTML='<b>SHOW ME — Navigation Guide</b>'+parts.map((p,i)=>`<div class="crumb">${i+1}. ${p}</div>`).join('')+(l.navigation?.length?'<hr><small>'+l.navigation.join('<br>')+'</small>':'');$('showbox').hidden=false}$('listen').onclick=speak;$('pause').onclick=pauseSpeech;$('resume').onclick=resumeSpeech;$('stop').onclick=stopSpeech;$('show').onclick=show;$('prev').onclick=()=>{stopSpeech();if(si>0){si--;render()}};$('next').onclick=()=>{stopSpeech();let l=DATA[ci].modules[mi].labs[li];if(si<l.steps.length-1){si++;render()}else alert('Lab complete. Select another lab or continue as directed by your instructor.')};$('course').onchange=e=>{stopSpeech();ci=+e.target.value;mi=li=si=0;loadCourse()};$('module').onchange=e=>{stopSpeech();mi=+e.target.value;li=si=0;loadModule()};$('lab').onchange=e=>{stopSpeech();li=+e.target.value;si=0;render()};window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;$('install').hidden=false});$('install').onclick=async()=>{if(deferredPrompt){deferredPrompt.prompt();deferredPrompt=null;$('install').hidden=true}};fetch('courses.json').then(r=>r.json()).then(d=>{DATA=d;let p=JSON.parse(localStorage.getItem('tib-mobile')||'{}');ci=p.ci||0;mi=p.mi||0;li=p.li||0;si=p.si||0;opt($('course'),DATA,c=>c.name);$('course').value=ci;loadCourse();si=Math.min(p.si||0,DATA[ci].modules[mi].labs[li].steps.length-1);render();if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js')});
 document.addEventListener('visibilitychange',()=>{if(document.hidden)stopSpeech();});window.addEventListener('pagehide',stopSpeech);
 
-
-// ---- TIB Mobile v1.0.2: Installation Experience ----
-let deferredInstallPrompt = null;
-
-function isIOSDevice(){
+// ---- TIB Mobile v1.0.5: iOS-only installation guidance ----
+function tibIOS(){
   return /iphone|ipad|ipod/i.test(navigator.userAgent);
 }
-function isStandaloneMode(){
+function tibStandalone(){
   return window.matchMedia('(display-mode: standalone)').matches ||
          window.navigator.standalone === true;
 }
-function updateInstallUI(){
-  const btn = document.getElementById('installApp');
-  const ios = document.getElementById('iosInstall');
-  const done = document.getElementById('installedStatus');
-  if(!btn || !ios || !done) return;
-
-  btn.hidden = false;
-  ios.hidden = true;
-  done.hidden = true;
-
-  if(isStandaloneMode()){
-    btn.textContent='✓ TIB APP INSTALLED';
-    btn.disabled=true;
-    done.hidden=false;
-    return;
-  }
-  btn.disabled=false;
-  btn.textContent='📲 INSTALL TIB APP';
-  if(isIOSDevice()) ios.hidden=false;
+function tibIOSGuide(){
+  const el=document.getElementById('iosInstallGuide');
+  if(el) el.hidden=!(tibIOS() && !tibStandalone());
 }
-
-window.addEventListener('beforeinstallprompt', (event) => {
-  event.preventDefault();
-  deferredInstallPrompt = event;
-  updateInstallUI();
-});
-
-window.addEventListener('appinstalled', () => {
-  deferredInstallPrompt = null;
-  updateInstallUI();
-});
-
-window.addEventListener('DOMContentLoaded', () => {
-  const btn = document.getElementById('installApp');
-  if(btn){
-    btn.addEventListener('click', async () => {
-      if(isStandaloneMode()) return;
-      if(isIOSDevice()){
-        alert('To install on iPhone/iPad: open this page in Safari, tap Share, then tap Add to Home Screen.');
-        return;
-      }
-      if(deferredInstallPrompt){
-        deferredInstallPrompt.prompt();
-        try {
-          await deferredInstallPrompt.userChoice;
-        } finally {
-          deferredInstallPrompt = null;
-          updateInstallUI();
-        }
-      } else {
-        alert('To install on Android: open this page in Chrome, tap the three-dot menu (⋮), then choose Install app or Add to Home screen.');
-      }
-    });
-  }
-  updateInstallUI();
-});
-
+window.addEventListener('DOMContentLoaded',tibIOSGuide);
+window.addEventListener('pageshow',tibIOSGuide);
