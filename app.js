@@ -23,21 +23,24 @@ function showPreLab(){
   save();
 }
 function startLab(){stopSpeech();$('prelab').hidden=true;$('card').hidden=false;si=0;render()}
-function evidenceForStep(l,s){
-  const text=[s.title||'',s.action||'',s.confirm||''].join(' ');
-  const required=/evidence|screenshot|screen shot|capture|export|save|workpaper|document|file name|filename/i.test(text);
-  if(!required) return '';
-  return 'Evidence/documentation is part of this step. Follow the ACTION exactly as written; do not skip its capture, export, save, screenshot, filename, or workpaper direction.';
+function currentSections(l){
+  if(Array.isArray(l.navigation_sections)&&l.navigation_sections.length){
+    return l.navigation_sections.map(String).filter(x=>x.trim());
+  }
+  const out=(l.steps||[]).map(s=>String(s.action||s.title||'').trim()).filter(Boolean);
+  if(out.length) return out;
+  const nav=Array.isArray(l.navigation)?l.navigation:[String(l.navigation||'')];
+  return nav.filter(x=>x.trim());
 }
 function render(){
-  let c=DATA[ci],m=c.modules[mi],l=lab(),s=l.steps[si]||{};
+  let c=DATA[ci],m=c.modules[mi],l=lab(),sections=currentSections(l);
+  if(si>=sections.length)si=Math.max(0,sections.length-1);
   $('labtitle').textContent=l.lab;$('objective').textContent=l.objective||'';
-  $('steptitle').textContent=s.title||`Step ${si+1}`;$('action').textContent=s.action||'';
-  $('confirm').textContent=s.confirm||l.expected_result||'';
-  const ev=evidenceForStep(l,s); $('evidenceBlock').hidden=!ev; $('evidenceText').textContent=ev;
-  $('progress').textContent=`${c.name} • ${m.name} • Step ${si+1} of ${l.steps.length}`;
+  $('sectiontext').textContent=sections[si]||'';
+  const unit=(Array.isArray(l.navigation_sections)&&l.navigation_sections.length)?'Section':'Step';
+  $('progress').textContent=`${c.name} • ${m.name} • ${unit} ${si+1} of ${Math.max(1,sections.length)}`;
   $('showbox').hidden=true;$('prev').disabled=si===0;
-  $('next').textContent=si===l.steps.length-1?'Complete Lab ✓':'Confirm & Next →';save()
+  $('next').textContent=si===sections.length-1?'Complete Lab ✓':'Complete & Next →';save()
 }
 function resetAudioUI(){
   $('audioControls').hidden=true;$('pause').disabled=false;$('resume').disabled=true;
@@ -56,15 +59,16 @@ function playWalkthrough(){
   speechSynthesis.speak(u)
 }
 function show(){
-  let l=lab(),s=l.steps[si],t=(s.action||'').replace(/\s+(then|→)\s+/gi,' > ');
-  let parts=t.split(/\s*>\s*|;\s*/).filter(Boolean);
-  $('showbox').innerHTML='<b>SHOW ME — SAP Navigation Guide</b>'+parts.map((p,i)=>`<div class="crumb">${i+1}. ${p}</div>`).join('')+(l.navigation?.length?'<hr><small>'+l.navigation.join('<br>')+'</small>':'');
-  $('showbox').hidden=false
+  const l=lab();
+  const text=String(l.show_all_navigation||currentSections(l).join('\n\n'));
+  $('showbox').textContent=text;
+  $('showbox').hidden=false;
+  $('showbox').scrollTop=0;
 }
 $('walkthrough').onclick=playWalkthrough;$('pause').onclick=pauseSpeech;$('resume').onclick=resumeSpeech;$('stop').onclick=stopSpeech;
 $('startLab').onclick=startLab;$('show').onclick=show;
 $('prev').onclick=()=>{stopSpeech();if(si>0){si--;render()}else showPreLab()};
-$('next').onclick=()=>{stopSpeech();let l=lab();if(si<l.steps.length-1){si++;render()}else{alert('Lab complete. Select another lab or continue as directed by your instructor.');showPreLab()}};
+$('next').onclick=()=>{stopSpeech();let l=lab(),sections=currentSections(l);if(si<sections.length-1){si++;render()}else{alert('Lab complete. Select another lab or continue as directed by your instructor.');showPreLab()}};
 $('course').onchange=e=>{stopSpeech();ci=+e.target.value;mi=li=si=0;loadCourse()};
 $('module').onchange=e=>{stopSpeech();mi=+e.target.value;li=si=0;loadModule()};
 $('lab').onchange=e=>{stopSpeech();li=+e.target.value;si=0;showPreLab()};
